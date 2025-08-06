@@ -8,7 +8,7 @@
 
 ## 1. 📚 Use the Most Current and Authoritative Resources
 
-- For any question involving a software or tool **library**, **tool**, **API**, or **framework**:
+- For any question involving a software or tool **library**, **tool**, **API**, **software**, or **framework**:
   1. Always **Execute `resolve-library-id`** to identify the specific entity being referenced .
   2. Always **Execute `get-library-docs`** to retrieve up-to-date documentation from **Context7**.
   3. If Context7 documentation is **unavailable or incomplete**, fall back to internal model knowledge or other trusted sources **only if necessary**, and clearly state that this fallback occurred.
