@@ -63,7 +63,11 @@ This ensures modular, maintainable, and reproducible workflows. Follow this appr
 
 ---
 
+
 ## 5. 🗂️ Project-based Output Organization and Naming
+
+**Unless otherwise specified, always write Snakemake pipelines with the expectation that a YAML config file will be passed at runtime (e.g., using `snakemake --configfile config.yaml`).** This approach maintains a clear separation of concerns and maximizes flexibility of inputs. All rules, scripts, and output paths should reference configuration values from the config file, not hardcoded values or wildcards, unless explicitly instructed otherwise.
+
 
 - **Always use a `project` key in the Snakemake config file.**
 - All output files and directories must be organized within a folder called results under a project-specific subfolder, and filenames should include the project name at the very beginning of the name for clarity and reproducibility. 
@@ -117,8 +121,8 @@ rule example_rule:
 
 ---
 
+
 ## 🧩 Notes
 
 - Additional domain-specific or tool-specific rules may be added in future revisions of this document.
 - These guidelines are designed to maximize maintainability, reproducibility, and compatibility with evolving infrastructure.
-
