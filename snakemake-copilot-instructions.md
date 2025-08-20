@@ -31,19 +31,20 @@ After asking the user the agent MUST explain the trade-offs (reproducibility, ea
 
 A. Singularity / Apptainer (recommended)
 
-- Global Containerization:
+  - Global Containerization:
   - Every workflow should specify a global Singularity container at the top of the Snakefile using the `singularity:` directive. This is the preferred default because it keeps rule environments consistent and reproducible.
 
-- Per-rule Containerization:
+ - Per-rule Containerization:
   - If a rule cannot run inside the global container (for example conflicting native libraries), use the `singularity:` directive on that rule to point to a per-rule container image.
 
-- Container Build & Distribution Requirements:
-  - All Singularity/Apptainer containers must be buildable without requiring sudo/root privileges. Prefer remote or user-mode builds (for example `singularity build --remote` or `apptainer build --remote`) rather than local root builds.
-  - When building locally is unavoidable, document the exact build commands and any external requirements; prefer using remote builders to avoid requiring root.
+ - Container Build & Distribution Requirements (remote-first policy):
+  - The agent MUST attempt a remote/user-mode build first. After loading the system Singularity/Apptainer module (see HPC Module Handling below), the agent shall run the remote build command (for example `singularity build --remote` or `apptainer build --remote`) as the first attempt.
+  - If the remote build command fails because the installed Singularity/Apptainer flavor does not support `--remote`, the agent MUST detect that specific failure and report it. The agent may then offer a documented fallback (for example requesting an older module that supports `--remote`, using a remote build service, or asking the user whether a local `--fakeroot` build is acceptable). The agent must NOT automatically attempt a `--fakeroot` or local root build without explicit user approval.
+  - When building locally is explicitly approved by the user, document the exact build commands and any external requirements.
 
 - HPC Module Handling and Fallbacks:
-  - On HPC systems that provide environment modules, the agent MUST first attempt to load the system-provided Singularity/Apptainer module (for example `ml load singularity` or `module load apptainer`). This is preferred because it usually integrates with the scheduler and the shared filesystem.
-  - If a suitable module isn't available (or is too old), the agent MAY install a user-local Apptainer/Singularity package via Conda. When doing so prefer `apptainer` (the maintained fork) or `singularity` packages from conda-forge and ensure the installed version meets the project's minimum (>= 3.x unless otherwise requested).
+  - On HPC systems that provide environment modules, the agent MUST first attempt to load the system-provided Singularity/Apptainer module (for example `ml load singularity` or `module load apptainer`). After loading the module the agent MUST check whether the binary supports remote builds (for example by running `singularity --version` and testing `singularity build --help` or invoking `singularity build --remote` as a probe). If the loaded module supports remote builds, use it to perform the remote build.
+  - If a suitable module isn't available or the loaded binary does not support remote builds, the agent MUST report this and present alternatives to the user (request loading an older module that supports remote builds, use a remote build service, or ask for permission to perform a local `--fakeroot` build). The agent may only install a user-local Apptainer/Singularity via Conda after the user approves that fallback.
   - If installing via Conda, create a named environment (for example `singularity-build`) and document the exact conda commands used so others can reproduce or remove the installation.
 
 By following these Singularity requirements workflows will be portable and robust across shared HPC environments.
